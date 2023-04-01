@@ -1,0 +1,183 @@
+openapi: 3.0.0
+info:
+  description: "This is a sample server for generate tables in the db."
+  version: "1.0.0"
+  title: "Django Tables Generator"
+  contact:
+    email: "arahman.hamdy91@gmail.com"
+host: "localhost:8000"
+basePath: "/api"
+tags:
+- name: "Tables"
+- name: "Rows"
+
+components:
+  schemas:
+    Table:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426655440000
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/Field'
+          example:
+            - title: field_name
+              data_type: number
+      required:
+        - id
+        - fields
+
+    Field:
+      type: object
+      properties:
+        title:
+          type: string
+          example: field_name
+        data_type:
+          type: string
+          enum: [number, string, boolean]
+          example: number
+      required:
+        - title
+        - data_type
+
+    Row:
+      type: object
+      additionalProperties: true
+
+paths:
+  /table:
+    post:
+      tags:
+      - "Tables"
+      summary: Create a new table
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fields:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Field'
+                  example:
+                    - title: field_name
+                      data_type: number
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Table'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+  /table/{id}:
+    put:
+      tags:
+        - "Tables"
+      summary: Update a table
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the table to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fields:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Field'
+                  example:
+                    - title: field_name
+                      data_type: number
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Table'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+
+  /table/row:
+    post:
+      tags:
+        - "Rows"
+      summary: Add a row to a table
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+              example:
+                field_name_1: value_1
+                field_name_2: value_2
+                field_name_3: value_3
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+  /table/{id}/rows:
+    get:
+      tags:
+        - "Rows"
+      summary: Get all rows in a table
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The ID of the table to get rows from
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas
+                type: object
+                additionalProperties: true
+                example:
+                  - field_name_1: value_1
+                    field_name_2: value_2
+                    field_name_3: value_3
+                  - field_name_1: value_4
+                    field_name_2: value_5
+                    field_name_3: value_6
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
